@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>yoink — repo-native secrets for developer teams</title>
+    <title>yoink — git-native secrets for developer teams</title>
     <meta
       name="description"
       content="Proof-of-concept: encrypted secrets that live in your repo. No external services."
@@ -134,6 +134,29 @@
         color: var(--text);
         font-weight: 500;
       }
+      .hero-usage {
+        margin-bottom: 32px;
+        padding: 16px 18px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        max-width: 560px;
+      }
+      .hero-usage-label {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      .hero-usage pre {
+        margin: 0;
+        padding: 0;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.75;
+        color: var(--accent);
+        white-space: pre;
+      }
       .cta-row {
         display: flex;
         align-items: center;
@@ -205,6 +228,101 @@
       }
       .install .note a:hover {
         color: var(--text);
+      }
+
+      /* ── quick start ── */
+      .quick-start {
+        margin-top: 48px;
+        padding: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+      }
+      .quick-start-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+      .quick-start-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .quick-start-step {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 0 12px;
+      }
+      .quick-start-step-num {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        padding-top: 2px;
+      }
+      .quick-start-step-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .quick-start-step pre {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 12px 14px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.65;
+        color: var(--accent);
+      }
+      .quick-start-step p {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px;
+        line-height: 1.6;
+      }
+      .command-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-top: 24px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .command-row {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 16px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        align-items: baseline;
+      }
+      .command-row:last-child {
+        border-bottom: none;
+      }
+      .command-row:nth-child(odd) {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .command-row code {
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .command-row span {
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      @media (max-width: 560px) {
+        .command-row {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
       }
 
       /* ── sections ── */
@@ -483,6 +601,7 @@
       <div class="wrap">
         <a href="#" class="nav-logo">yoink</a>
         <div class="nav-links">
+          <a href="#quick-start">quick start</a>
           <a href="#how-it-works">how it works</a>
           <a href="#limitations">limitations</a>
           <a href="https://github.com/jack-kitto/yoink-py" target="_blank"
@@ -504,33 +623,137 @@
             <strong>git pull requests</strong>, not dashboards.
             <strong>No external services</strong>, no secret sprawl.
           </p>
+          <div class="hero-usage">
+            <div class="hero-usage-label">From any git repo</div>
+            <pre>
+cd your-repo
+yoink secrets
+yoink run dev -- pnpm start</pre
+            >
+          </div>
           <div class="cta-row">
+            <a href="#quick-start" class="btn btn-primary">get started ↓</a>
             <a
               href="https://github.com/jack-kitto/yoink-py"
-              class="btn btn-primary"
+              class="btn btn-ghost"
               target="_blank"
             >
               ★ star on github
             </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- quick start -->
+      <section id="quick-start">
+        <div class="wrap">
+          <h2>Quick start</h2>
+          <p
+            style="
+              color: var(--muted);
+              font-size: 13px;
+              margin-bottom: 24px;
+              line-height: 1.7;
+              max-width: 560px;
+            "
+          >
+            Three steps. Run them from any git repo where you want encrypted
+            secrets.
+          </p>
+
+          <div class="quick-start">
+            <div class="quick-start-steps">
+              <div class="quick-start-step">
+                <div class="quick-start-step-num">1</div>
+                <div>
+                  <div class="quick-start-step-title">Install</div>
+                  <pre>
+pip install yoink-py
+brew install age</pre
+                  >
+                  <p>
+                    Requires Python 3.11+ and
+                    <a
+                      href="https://github.com/FiloSottile/age"
+                      target="_blank"
+                      style="color: var(--muted); text-decoration: underline"
+                      >age</a
+                    >. macOS and Linux.
+                  </p>
+                </div>
+              </div>
+              <div class="quick-start-step">
+                <div class="quick-start-step-num">2</div>
+                <div>
+                  <div class="quick-start-step-title">
+                    Bootstrap and edit secrets
+                  </div>
+                  <pre>
+cd your-repo
+yoink secrets</pre
+                  >
+                  <p>
+                    First run creates
+                    <strong style="color: var(--text)">.yoink/</strong> with
+                    <strong style="color: var(--text)">dev</strong>,
+                    <strong style="color: var(--text)">staging</strong>, and
+                    <strong style="color: var(--text)">production</strong>
+                    environments, then opens your editor. Add key=value lines,
+                    save and quit. Two recovery keys print once — back them up.
+                  </p>
+                </div>
+              </div>
+              <div class="quick-start-step">
+                <div class="quick-start-step-num">3</div>
+                <div>
+                  <div class="quick-start-step-title">Run with secrets</div>
+                  <pre>yoink run dev -- python app.py</pre>
+                  <p>
+                    Decrypts the <strong style="color: var(--text)">dev</strong>
+                    environment and injects secrets as env vars. Works with any
+                    command — no app changes needed.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 style="margin-top: 48px; font-size: 20px">Commands</h2>
+          <div class="command-list">
+            <div class="command-row">
+              <code>yoink secrets</code>
+              <span>Edit all secrets in $EDITOR</span>
+            </div>
+            <div class="command-row">
+              <code>yoink run &lt;env&gt; -- &lt;cmd&gt;</code>
+              <span>Run a command with secrets injected</span>
+            </div>
+            <div class="command-row">
+              <code>yoink access edit</code>
+              <span>Review members and access requests in $EDITOR</span>
+            </div>
+            <div class="command-row">
+              <code>yoink access request</code>
+              <span>Request vault access (new developers)</span>
+            </div>
+          </div>
+
+          <p style="color: var(--muted); font-size: 13px; margin-top: 24px">
+            Walk through a full example in the
             <a
-              href="https://github.com/jack-kitto/yoink-py/issues"
-              class="btn btn-ghost"
+              href="https://github.com/jack-kitto/yoink-py/tree/main/example"
+              style="color: var(--muted); text-decoration: underline"
               target="_blank"
+              >example/</a
             >
-              open an issue
-            </a>
-          </div>
-          <div class="install">
-            <div class="install-label">install</div>
-            <code>pip install yoink-py</code>
-            <code>brew install age</code>
-            <p class="note">
-              Requires Python 3.11+ and
-              <a href="https://github.com/FiloSottile/age" target="_blank"
-                >age</a
-              >. Works on macOS and Linux.
-            </p>
-          </div>
+            directory, or read the
+            <a
+              href="https://github.com/jack-kitto/yoink-py/blob/main/README.md"
+              style="color: var(--muted); text-decoration: underline"
+              target="_blank"
+              >README</a
+            >.
+          </p>
         </div>
       </section>
 
@@ -761,6 +984,11 @@
       <div class="wrap">
         <p>yoink — proof of concept, MIT license</p>
         <div class="footer-links">
+          <a
+            href="https://github.com/jack-kitto/yoink-py/blob/main/README.md"
+            target="_blank"
+            >readme</a
+          >
           <a href="https://github.com/jack-kitto/yoink-py" target="_blank"
             >github</a
           >
