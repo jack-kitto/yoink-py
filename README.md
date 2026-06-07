@@ -1,12 +1,14 @@
 # Yoink
 
-Lean, repo-native secrets for developer teams.
+Lean, git-native secrets for developer teams.
 
 Encrypted secrets live in your repo. Developers decrypt only what they have access to.
 
+**Landing page:** [jack-kitto.github.io/yoink-py](https://jack-kitto.github.io/yoink-py/)
+
 ## Requirements
 
-- Python 3.9+
+- Python 3.11+
 - [age](https://github.com/FiloSottile/age) (`brew install age`)
 - Git
 
