@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "yoink-py"
 version = "0.1.0"
-description = "Proof-of-concept: encrypted repo-native secrets for developer teams"
+description = "Proof-of-concept: encrypted git-native secrets for developer teams"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
