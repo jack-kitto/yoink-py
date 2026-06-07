@@ -2,3 +2,4 @@ yoink/__pycache__
 yoink_py.egg-info
 .pypirc
 example/.yoink
+dist
