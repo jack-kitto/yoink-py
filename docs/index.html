@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>yoink — repo-native secrets for developer teams</title>
+    <meta
+      name="description"
+      content="Proof-of-concept: encrypted secrets that live in your repo. No external services."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Berkeley+Mono:ital,wght@0,100..700;1,100..700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0e0e0e;
+        --surface: #161616;
+        --border: #2a2a2a;
+        --text: #e8e3db;
+        --muted: #7a7570;
+        --accent: #c8f060;
+        --accent-dim: #8faa40;
+        --danger: #f06060;
+        --mono: "Berkeley Mono", "Fira Code", monospace;
+        --serif: "Instrument Serif", Georgia, serif;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 14px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── layout ── */
+      .wrap {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ── nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(14, 14, 14, 0.92);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 0;
+      }
+      nav .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-logo {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--accent);
+        text-decoration: none;
+        letter-spacing: -0.02em;
+      }
+      .nav-links {
+        display: flex;
+        gap: 24px;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.15s;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+      }
+
+      /* ── hero ── */
+      .hero {
+        padding: 96px 0 72px;
+        border-bottom: 1px solid var(--border);
+      }
+      .hero-tag {
+        display: inline-block;
+        background: rgba(200, 240, 96, 0.08);
+        border: 1px solid rgba(200, 240, 96, 0.2);
+        color: var(--accent);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 2px;
+        margin-bottom: 28px;
+      }
+      h1 {
+        font-family: var(--serif);
+        font-size: clamp(36px, 6vw, 56px);
+        font-weight: 400;
+        font-style: italic;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin-bottom: 24px;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero-sub {
+        font-size: 15px;
+        color: var(--muted);
+        max-width: 520px;
+        line-height: 1.8;
+        margin-bottom: 40px;
+      }
+      .hero-sub strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+      .cta-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 3px;
+        transition: all 0.15s;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #0e0e0e;
+      }
+      .btn-primary:hover {
+        background: #d8ff70;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        color: var(--text);
+        border-color: #444;
+      }
+
+      /* ── install block ── */
+      .install {
+        margin-top: 48px;
+        padding: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+      }
+      .install-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .install code {
+        font-family: var(--mono);
+        font-size: 14px;
+        color: var(--accent);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .install .note {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 12px;
+      }
+      .install .note a {
+        color: var(--muted);
+        text-decoration: underline;
+        text-decoration-color: var(--border);
+      }
+      .install .note a:hover {
+        color: var(--text);
+      }
+
+      /* ── sections ── */
+      section {
+        padding: 72px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      section:last-child {
+        border-bottom: none;
+      }
+
+      h2 {
+        font-family: var(--serif);
+        font-size: 28px;
+        font-weight: 400;
+        font-style: italic;
+        color: var(--text);
+        margin-bottom: 32px;
+        letter-spacing: -0.01em;
+      }
+
+      /* ── how it works ── */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 0 20px;
+        padding: 24px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .step:last-child {
+        border-bottom: none;
+      }
+      .step-num {
+        font-size: 11px;
+        color: var(--accent);
+        padding-top: 2px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+      }
+      .step-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .step-desc {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .step-desc strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* ── code blocks ── */
+      .code-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 24px 0;
+      }
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .code-lang {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .code-block pre {
+        padding: 16px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.65;
+        color: var(--text);
+      }
+      .code-block pre .c {
+        color: var(--muted);
+      }
+      .code-block pre .k {
+        color: var(--accent);
+      }
+      .code-block pre .s {
+        color: #a8d8a8;
+      }
+      .code-block pre .h {
+        color: #88b8e8;
+      }
+      .code-block pre .p {
+        color: var(--muted);
+      }
+
+      /* ── two-col layout ── */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-top: 32px;
+      }
+      @media (max-width: 560px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+      .col-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 20px;
+      }
+      .col-card-title {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+      .col-card p {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .col-card p strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* ── poc notice ── */
+      .poc-notice {
+        background: rgba(240, 96, 96, 0.06);
+        border: 1px solid rgba(240, 96, 96, 0.2);
+        border-radius: 4px;
+        padding: 20px 24px;
+        margin-bottom: 32px;
+      }
+      .poc-notice-title {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--danger);
+        margin-bottom: 8px;
+      }
+      .poc-notice p {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .poc-notice p a {
+        color: var(--muted);
+        text-decoration: underline;
+      }
+      .poc-notice p a:hover {
+        color: var(--text);
+      }
+
+      /* ── limitations ── */
+      .limit-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .limit-list li {
+        display: grid;
+        grid-template-columns: 20px 1fr;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+      .limit-list li::before {
+        content: "—";
+        color: var(--danger);
+      }
+      .limit-list li strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* ── cta footer ── */
+      .cta-section {
+        text-align: center;
+        padding: 96px 0;
+      }
+      .cta-section h2 {
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+      .cta-section p {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 32px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .cta-section .cta-row {
+        justify-content: center;
+      }
+
+      /* ── footer ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 28px 0;
+      }
+      footer .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      footer p {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--text);
+      }
+      .footer-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      /* ── animations ── */
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hero > * {
+        animation: fade-up 0.5s ease both;
+      }
+      .hero > *:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .hero > *:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+      .hero > *:nth-child(3) {
+        animation-delay: 0.18s;
+      }
+      .hero > *:nth-child(4) {
+        animation-delay: 0.24s;
+      }
+      .hero > *:nth-child(5) {
+        animation-delay: 0.3s;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="wrap">
+        <a href="#" class="nav-logo">yoink</a>
+        <div class="nav-links">
+          <a href="#how-it-works">how it works</a>
+          <a href="#limitations">limitations</a>
+          <a href="https://github.com/jack-kitto/yoink-py" target="_blank"
+            >github</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- hero -->
+      <section class="hero">
+        <div class="wrap">
+          <div class="hero-tag">proof of concept</div>
+          <h1>Secrets that live<br />in your <em>repo.</em></h1>
+          <p class="hero-sub">
+            Age-encrypted secrets committed alongside your code. Each developer
+            holds their own key. Access is managed via
+            <strong>git pull requests</strong>, not dashboards.
+            <strong>No external services</strong>, no secret sprawl.
+          </p>
+          <div class="cta-row">
+            <a
+              href="https://github.com/jack-kitto/yoink-py"
+              class="btn btn-primary"
+              target="_blank"
+            >
+              ★ star on github
+            </a>
+            <a
+              href="https://github.com/jack-kitto/yoink-py/issues"
+              class="btn btn-ghost"
+              target="_blank"
+            >
+              open an issue
+            </a>
+          </div>
+          <div class="install">
+            <div class="install-label">install</div>
+            <code>pip install yoink-py</code>
+            <code>brew install age</code>
+            <p class="note">
+              Requires Python 3.11+ and
+              <a href="https://github.com/FiloSottile/age" target="_blank"
+                >age</a
+              >. Works on macOS and Linux.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- the idea -->
+      <section id="idea">
+        <div class="wrap">
+          <div class="poc-notice">
+            <div class="poc-notice-title">This is a proof of concept</div>
+            <p>
+              The code was written fast to test an idea. It works, with real
+              limitations. If it gets traction, the goal is a Go rewrite using
+              the
+              <a href="https://charm.sh" target="_blank">Charm Bracelet</a>
+              stack — a single binary, no Python required, with the same vault
+              format so nothing needs migrating. Read the
+              <a
+                href="https://github.com/jack-kitto/yoink-py/blob/main/ROADMAP.md"
+                target="_blank"
+                >roadmap</a
+              >.
+            </p>
+          </div>
+
+          <h2>The idea</h2>
+          <div class="two-col">
+            <div class="col-card">
+              <div class="col-card-title">the problem</div>
+              <p>
+                Every secrets management tool either costs money, requires an
+                external service, or involves so much setup that small teams
+                just use a shared <strong>.env in Slack</strong>.
+              </p>
+            </div>
+            <div class="col-card">
+              <div class="col-card-title">the bet</div>
+              <p>
+                Age-encrypted files in the repo give you version control and
+                PR-based access management for free. And age encryption is
+                probably <strong>secure enough for most teams</strong> — few
+                moving parts, tiny attack surface, no external service to
+                compromise. You lose auditing and centralised control. You gain
+                simplicity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- how it works -->
+      <section id="how-it-works">
+        <div class="wrap">
+          <h2>How it works</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">01</div>
+              <div>
+                <div class="step-title">First use bootstraps everything</div>
+                <div class="step-desc">
+                  Run any command inside a git repo.
+                  <code style="color: var(--accent)">yoink</code> creates
+                  <strong>.yoink/</strong> with encrypted environment files,
+                  generates your identity keypair in <strong>~/.yoink/</strong>,
+                  and prints two vault-wide recovery keys — once.
+                </div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">02</div>
+              <div>
+                <div class="step-title">Edit secrets like a file</div>
+                <div class="step-desc">
+                  <code style="color: var(--accent)">yoink secrets</code> opens
+                  a plaintext buffer in <strong>$EDITOR</strong>. All
+                  environments, all secrets. Edit values, add keys, delete
+                  lines, add new <strong>[environment]</strong> sections. Save
+                  and quit — changes are diffed and re-encrypted.
+                </div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">03</div>
+              <div>
+                <div class="step-title">Access via PR</div>
+                <div class="step-desc">
+                  New developer runs
+                  <code style="color: var(--accent)">yoink access request</code
+                  >, commits the resulting JSON file, and opens a PR. A
+                  maintainer runs
+                  <code style="color: var(--accent)">yoink access edit</code>,
+                  moves the request line into the members list, saves. Vault
+                  files are re-encrypted.
+                </div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">04</div>
+              <div>
+                <div class="step-title">Inject into any process</div>
+                <div class="step-desc">
+                  <code style="color: var(--accent)"
+                    >yoink run dev -- python app.py</code
+                  >
+                  decrypts the environment and injects secrets as env vars. No
+                  config changes to your app.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">secrets buffer</span>
+            </div>
+            <pre><span class="c"># yoink secrets — edit freely, save to apply</span>
+
+<span class="h">[dev]</span>
+<span class="k">DATABASE_URL</span>=postgres://localhost/mydb
+<span class="k">API_KEY</span>=sk_test_abc
+
+<span class="h">[staging]</span>
+<span class="k">DATABASE_URL</span>=postgres://staging/mydb
+
+<span class="h">[production]</span>
+<span class="k">DATABASE_URL</span>=postgres://prod/mydb</pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">access buffer</span>
+            </div>
+            <pre><span class="c"># move a request into members to approve, delete to reject</span>
+
+<span class="h">## members</span>
+<span class="k">jack</span>    dev staging production
+<span class="k">sarah</span>   dev staging
+
+<span class="h">## requests</span>
+<span class="k">bob</span>     dev staging</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- limitations -->
+      <section id="limitations">
+        <div class="wrap">
+          <h2>Limitations</h2>
+          <p
+            style="
+              color: var(--muted);
+              font-size: 13px;
+              margin-bottom: 24px;
+              line-height: 1.7;
+            "
+          >
+            These are real. Know them before deciding whether this is right for
+            your use case.
+          </p>
+          <ul class="limit-list">
+            <li>
+              <span
+                ><strong>Git history is immutable.</strong> Revoking access
+                doesn't erase past exposure. Rotate critical secrets after
+                revoking someone.</span
+              >
+            </li>
+            <li>
+              <span
+                ><strong>No audit log.</strong> Who decrypted what and when is
+                not tracked.</span
+              >
+            </li>
+            <li>
+              <span
+                ><strong>Re-encryption is not atomic.</strong> A crash
+                mid-operation could leave files inconsistent.</span
+              >
+            </li>
+            <li>
+              <span
+                ><strong>Proof of concept.</strong> Error handling is basic.
+                Edge cases exist. Not hardened for adversarial
+                environments.</span
+              >
+            </li>
+          </ul>
+          <p style="color: var(--muted); font-size: 13px; margin-top: 24px">
+            See
+            <a
+              href="https://github.com/jack-kitto/yoink-py/blob/main/ROADMAP.md"
+              style="color: var(--muted); text-decoration: underline"
+              target="_blank"
+              >ROADMAP.md</a
+            >
+            for what a more complete version would address.
+          </p>
+        </div>
+      </section>
+
+      <!-- cta -->
+      <section class="cta-section">
+        <div class="wrap">
+          <h2>Try it. Break it. Tell me.</h2>
+          <p>
+            If it works for you, star the repo. If it breaks, open an issue.
+            Both are useful.
+          </p>
+          <div class="cta-row">
+            <a
+              href="https://github.com/jack-kitto/yoink-py"
+              class="btn btn-primary"
+              target="_blank"
+            >
+              ★ star on github
+            </a>
+            <a
+              href="https://github.com/jack-kitto/yoink-py/issues/new"
+              class="btn btn-ghost"
+              target="_blank"
+            >
+              open an issue
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>yoink — proof of concept, MIT license</p>
+        <div class="footer-links">
+          <a href="https://github.com/jack-kitto/yoink-py" target="_blank"
+            >github</a
+          >
+          <a
+            href="https://github.com/jack-kitto/yoink-py/blob/main/ROADMAP.md"
+            target="_blank"
+            >roadmap</a
+          >
+          <a href="https://pypi.org/project/yoink-py/" target="_blank">pypi</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

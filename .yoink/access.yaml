@@ -1,0 +1,10 @@
+version: 1
+entries:
+- name: recovery-1
+  kind: recovery
+  public_key: age16mwpp5xdwku3fzz674ltl466j9ej4peqgef3t9ekl5xqgn3y8ceq3w57dv
+  added_at: '2026-05-19T12:15:11+00:00'
+- name: recovery-2
+  kind: recovery
+  public_key: age1mpmqtkjdxnd3mukjg4xr857534r22cakwsc4fezp02r04jpcep6secvly5
+  added_at: '2026-05-19T12:15:11+00:00'
