@@ -160,7 +160,7 @@ def _open_editor_with_retry(content: str, parse_fn, suffix: str = ".env"):
 @click.version_option(__version__, prog_name="yoink")
 @click.pass_context
 def cli(ctx):
-    """Yoink — lean, repo-native secrets for developer teams."""
+    """Yoink — lean, git-native secrets for developer teams."""
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
